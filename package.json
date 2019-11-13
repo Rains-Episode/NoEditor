@@ -1,0 +1,33 @@
+{
+  "name": "noeditor",
+  "version": "1.0.0",
+  "description": "An ordinary rich text editor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp build",
+    "dev": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rains-Episode/REditor.git"
+  },
+  "keywords": [
+    "Rich",
+    "Text",
+    "Editor"
+  ],
+  "author": "Rain",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Rains-Episode/REditor/issues"
+  },
+  "homepage": "https://github.com/Rains-Episode/REditor#readme",
+  "dependencies": {
+    "browserify": "^16.5.0",
+    "gulp": "^4.0.2",
+    "tsify": "^4.0.1",
+    "typescript": "^3.6.4",
+    "vinyl-source-stream": "^2.0.0"
+  }
+}
