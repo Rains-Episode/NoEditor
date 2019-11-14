@@ -2,7 +2,7 @@ import { VStyleData } from "./VStyle";
 
 let $VNodeKey: number = 0;
 
-export abstract class VNode {
+export class VNode {
 
   public parent: VNode;
   public children: Array<VNode> = [];
@@ -16,7 +16,7 @@ export abstract class VNode {
   public get removed(): boolean { return this._removed; }
 
   constructor() {
-    
+
   }
 
   public appendChild(child: VNode): void {

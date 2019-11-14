@@ -1,3 +1,4 @@
+
 export type VStyleData = Record<string, string>
 export class VStyle {
   public static equals(vstyleA: VStyleData, vstyleB: VStyleData) {

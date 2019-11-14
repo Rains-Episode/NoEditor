@@ -16,10 +16,11 @@ const build = () => {
 		.pipe(gulp.dest('./bin/bundle'));
 }
 
-gulp.task('build', build);
-
-gulp.task('default', () => {
+const watch = () => {
 	gulp.watch('./src/ts/**/*.ts', {
 		delay: 1000
 	}, build);
-});
+}
+
+exports.build = build;
+exports.default = gulp.series(build, watch);

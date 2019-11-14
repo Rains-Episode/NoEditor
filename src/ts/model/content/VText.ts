@@ -4,6 +4,7 @@ import { VNode } from "./VNode";
 import { VStyleData } from "./VStyle";
 
 export class VText extends VNode {
+
   private _text: string = '';
 
   public text(): string { return this._text; }
@@ -18,12 +19,12 @@ export class VText extends VNode {
     return vtext;
   }
 
-  public remove(): void {
+  public remove() {
     Pool.recoverByClass(this);
     super.remove();
   }
 
-  public changeText(text: string): void {
+  public changeText(text: string) {
     if (text == void 0) return;
     this._text = text;
   }

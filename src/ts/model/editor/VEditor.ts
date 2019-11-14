@@ -12,10 +12,11 @@ export class VEditor {
   public selection: VSelection = new VSelection();
 
   constructor() {
-
+    
   }
 
   public oninput(data: string) {
+    
     // const anchor = this.selection.anchorNode;
     // if ( ! anchor) {
     //   //TODO 
@@ -23,13 +24,10 @@ export class VEditor {
     // }
     // if ( ! VStyle.equals(this.currStyle, anchor.style)) {
     //   //TODO
-      
     // }
-    
     // if (anchor instanceof VText) {
     //   (anchor as VText).changeText(data);
     // } else {
-      
     // }
   }
 
@@ -41,12 +39,6 @@ export class VEditor {
   private _updateStyle() {
     const sel = this.selection;
     if ( ! sel.anchorNode || ! sel.focusNode) return;
-
-  }
-
-
-  private _render() {
-
   }
 
 }

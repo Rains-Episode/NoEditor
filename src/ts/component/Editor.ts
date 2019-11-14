@@ -32,11 +32,17 @@ export class Editor {
 
   private _oninput(e: InputEvent) {
     this._soul.oninput(e.data);
+
   }
 
   private _onselectionchange(e: Event) {
     const sel = window.getSelection();
+    
     console.log('current selection: ', sel);
+  }
+
+  private _render() {
+    
   }
 
   public onListener() {
