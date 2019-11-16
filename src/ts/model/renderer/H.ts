@@ -1,47 +1,71 @@
 import { VNode } from "../content/VNode";
 
+
+export class $domApi {
+  static createElement(tag: string) {
+    return document.createElement(tag);
+  }
+  static isTextNode (node: Node): boolean {
+    return node && (node.nodeType === Node.TEXT_NODE || node instanceof Text);
+  }
+  static setCaretPos(node: Node, pos: number) {
+
+  }
+}
+
 /**
  * 
  */
-class H {
+export class $h {
 
-  isVNode(vnode: any): boolean {
+  static __VNODE_SIGN = 'NoEditor__VNODE__';
+
+  static isVNode(vnode: any): boolean {
     return vnode instanceof VNode;
   }
-  isSameVNode(nodeA: VNode, nodeB: VNode): boolean {
+
+  static isSameVNode(nodeA: VNode, nodeB: VNode): boolean {
     return nodeA.key === nodeB.key;
   }
 
-  getVNodeByElement(ele: Element): VNode {
-    return new VNode();
+  static getVNodeByEle(ele: Element | Node): VNode {
+    return ele[$h.__VNODE_SIGN];
   }
 
-  createElement(vnode: VNode) {
+  static createElement(vnode: VNode) {
     const ele = document.createElement('span');
-
+    //TODO
     return ele;
   }
-  updateChildren() {
 
+  static updateChildren() {
+    //TODO
   }
 
-  patchVNode() {
-
+  static patchVNode() {
+    //TODO
   }
-  patch(oldNode: any, vnode: VNode) {
-    //TODO may need some hooks
-    if ( ! this.isVNode(oldNode)) {
-      oldNode = this.getVNodeByElement(oldNode);
+
+  static patch(oldNode: any, vnode: VNode) {
+    //TODO need some hooks
+    if ( ! $h.isVNode(oldNode)) {
+      oldNode = $h.getVNodeByEle(oldNode);
     }
-    if (this.isSameVNode(oldNode, vnode)) {
+    if ($h.isSameVNode(oldNode, vnode)) {
       
     }
+  }
+
+  static renderNode(vnode: VNode) {
+    const ele = $domApi.createElement('div');
+    ele.textContent = vnode.text;
+    ele[$h.__VNODE_SIGN] = vnode;
+    for (let i = 0; i < vnode.children.length; i++) 
+      ele.appendChild($h.renderNode(vnode.children[i]));
+    return ele;
   }
 }
 
 export const VNodeElementMap = {
   
 }
-
-
-

@@ -9,11 +9,19 @@ export class VNode {
 
   public style: VStyleData;
   
+  private _text: string = '';
   private _key: string = `${++$VNodeKey}`;
   private _removed: boolean = false;
 
+  public get text(): string { return this._text; }
   public get key(): string { return this._key; }
   public get removed(): boolean { return this._removed; }
+
+  public set text(val: string) {
+    for (let i = 0; i < this.children.length; i++) this.children[i].remove();
+    this.children.length = 0;
+    this._text = `${val || ''}`;
+  }
 
   constructor() {
 
