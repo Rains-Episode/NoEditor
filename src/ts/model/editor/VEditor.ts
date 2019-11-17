@@ -31,13 +31,17 @@ export class VEditor {
 
   public onselectionchange(sel: VSelectionData) {
     this.selection.setSelection(sel);
-    this._updateStyle();
+    this._updateStyleBySelection();
   }
 
-  private _updateStyle() {
+  private _updateStyleBySelection() {
     const sel = this.selection;
     if ( ! sel.anchorNode || ! sel.focusNode) return;
 
+  }
+
+  public setStyle() {
+    
   }
 
 }

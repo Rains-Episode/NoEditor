@@ -1,5 +1,12 @@
 import { VNode } from "../content/VNode";
 
+export interface VRangeData {
+  anchorNode?: VNode,
+  anchorOffset?: number,
+  focusNode?: VNode,
+  focusOffset?: number
+}
+
 export interface VSelectionData {
   anchorNode?: VNode;
   anchorOffset?: number;

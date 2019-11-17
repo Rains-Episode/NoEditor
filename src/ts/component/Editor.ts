@@ -12,6 +12,7 @@ export class Editor {
   private _soul: VEditor = new VEditor();
 
   private _isNeedRender: boolean = true;
+  private _isSelectStarted: boolean = false;
 
   private _options: EditorOptions = {
     rows: 10,
@@ -32,7 +33,6 @@ export class Editor {
     div.style.width = `${ops.cols}rem`;
     div.style.height = `${ops.rows}rem`;
     this._body = div;
-
     this._render();
     this.onListener();
   }
@@ -43,27 +43,42 @@ export class Editor {
 
   private get _isFocusOnEditor(): boolean {
     const sel = window.getSelection();
-    return sel.anchorNode === this._body || sel.focusNode === this._body;
+    return $domApi.isFocusOnEle(sel.anchorNode, this._body) || $domApi.isFocusOnEle(sel.focusNode, this._body);
   }
 
   private _oninput(e: InputEvent) {
     const sel = window.getSelection();
     this._soul.oninput(sel.anchorNode.textContent);
     this._isNeedRender = true;
+    this._isSelectStarted = true;
+    this._onselectend();
+  }
+  
+  private _onmousedown(e: MouseEvent) {
+    document.onmouseout = (e: MouseEvent) => { this._onselectend(e) }
   }
 
-  private _onselectionchange(e: Event) {
+  private _onselectstart(e: Event) {
+    console.log('select start', window.getSelection());
+    this._isSelectStarted = true;
+  }
+
+  private _onselectend(e?: MouseEvent) {
+    document.onmouseout = void 0;
+    console.log('select end')
+    if ( ! this._isSelectStarted) return;
+    this._isSelectStarted = false;
     const sel = window.getSelection();
     console.log('rsel : ', sel);
     let vsel: VSelectionData;
     if (this._isFocusOnEditor) {
       vsel = {
         anchorNode: this._soul.content,
-        anchorOffset: 0,
+        anchorOffset: sel.anchorOffset,
         focusNode: this._soul.content,
-        focusOffset: 0,
-        isCollapsed: true,
-        rangeCount: 1
+        focusOffset: sel.focusOffset,
+        isCollapsed: sel.isCollapsed,
+        rangeCount: sel.rangeCount
       }
     } else {
       vsel = {
@@ -94,14 +109,15 @@ export class Editor {
   }
 
   private _renderSelection() {
-    const rsel = window.getSelection();
     const vsel = this._soul.selection;
-    // console.log('rsel: ', rsel);
-    // console.log('vsel: ', vsel);
+    if ( ! vsel.anchorNode || ! vsel.anchorNode.entity || ! vsel.anchorNode.entity.childNodes || ! vsel.anchorNode.entity.childNodes[0]) return;
+    $domApi.setCaretPos(vsel.anchorNode.entity.childNodes[0], vsel.anchorOffset);
   }
 
   public onListener() {
     this._body.oninput = (e: InputEvent) => { this._oninput(e) };
-    document.onselectionchange = (e: Event) => { this._onselectionchange(e); }
+    document.onselectstart = (e: Event) => { this._onselectstart(e); }
+    document.onmousedown = (e: MouseEvent) => { this._onmousedown(e); }
+    document.onmouseup = (e: MouseEvent) => { this._onselectend(e); }
   }
 }

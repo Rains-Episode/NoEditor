@@ -5,11 +5,36 @@ export class $domApi {
   static createElement(tag: string) {
     return document.createElement(tag);
   }
+  
   static isTextNode (node: Node): boolean {
     return node && (node.nodeType === Node.TEXT_NODE || node instanceof Text);
   }
-  static setCaretPos(node: Node, pos: number) {
 
+  static isFocusOnEle(focus: Element | Node, ele: Element): boolean {
+    return focus === ele || ($domApi.isTextNode(focus) && focus.parentElement === ele);
+  }
+
+  // ===== 4 selection ===== 
+  static setSelection(anchorNode: Node, anchorOffset: number, focusNode: Node, focusOffset: number) { 
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    const range = document.createRange();
+    range.setStart(anchorNode, anchorOffset);
+    range.setEnd(focusNode, focusOffset);
+    sel.addRange(range);
+  }
+  static setCaretPos(node: Node, pos: number) {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    const range = document.createRange();
+    range.setStart(node, pos);
+    range.collapse();
+    sel.addRange(range);
+  }
+
+
+  static setStyle() {
+    //TODO
   }
 }
 
@@ -57,7 +82,8 @@ export class $h {
   }
 
   static renderNode(vnode: VNode) {
-    const ele = $domApi.createElement('div');
+    const ele = vnode.entity || $domApi.createElement('div');
+    vnode.entity || (vnode.entity = ele);
     ele.textContent = vnode.text;
     ele[$h.__VNODE_SIGN] = vnode;
     for (let i = 0; i < vnode.children.length; i++) 
