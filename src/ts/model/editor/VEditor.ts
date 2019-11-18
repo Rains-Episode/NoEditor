@@ -19,7 +19,7 @@ export class VEditor {
     const anchor = this.selection.anchorNode;
     console.log('anchor: ', anchor, 'data: ', data);
     if ( ! anchor) {
-      //TODO 
+      //TODO
       return;
     }
     this.content.text = data;
@@ -37,7 +37,7 @@ export class VEditor {
   private _updateStyleBySelection() {
     const sel = this.selection;
     if ( ! sel.anchorNode || ! sel.focusNode) return;
-
+    
   }
 
   public setStyle() {

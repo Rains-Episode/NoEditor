@@ -1,4 +1,4 @@
-import { VStyleData } from "./VStyle";
+import { VStyle } from "./VStyle";
 import { Pool } from "../utils/Pool";
 
 let $VNodeKey: number = 0;
@@ -9,12 +9,12 @@ export class VNode {
   public parent: VNode;
   public children: Array<VNode> = [];
 
-  public style: VStyleData;
+  public style: VStyle;
   
   private _text: string = '';
   private _key: string
   private _removed: boolean = false;
-
+ 
   public get text(): string { return this._text; }
   public get key(): string { return this._key; }
   public get removed(): boolean { return this._removed; }
@@ -26,16 +26,16 @@ export class VNode {
   }
 
   constructor() {
-    this.genKey();
+    this.resetKey();
   }
 
-  public genKey() {
+  public resetKey() {
     this._key = `${++$VNodeKey}`;
   }
 
   public static create(): VNode {
     const vnode = Pool.getByClass(VNode) as VNode;
-    vnode.genKey()
+    vnode.resetKey()
     return vnode;
   }
 
@@ -48,9 +48,58 @@ export class VNode {
     this.children.push(child);
   }
 
+  public appendTo(vnode: VNode) {
+    //TODO
+  }
+
   public remove(): void {
     this._removed = true;
     //TODO
+  }
+
+
+
+  public static findCommonParent(vnodeA: VNode, vnodeB: VNode): VNode {
+    const getTreeLen = (vnode: VNode) => {
+      let len = 0;
+      let par = vnode;
+      while(par = vnode.parent) len++;
+      return len;
+    }
+    let lenA = getTreeLen(vnodeA);
+    let lenB = getTreeLen(vnodeB);
+    for (; lenA > lenB; lenA--) vnodeA = vnodeA.parent;
+    for (; lenB > lenA; lenB--) vnodeB = vnodeB.parent;
+    // while() {
+      
+    // }
+    return;
+  }
+
+  public static getNodesBetween2Node(vnodeA: VNode, vnodeB: VNode): VNode[] {
+    const arr = [];
+    if (vnodeA.parent === vnodeB.parent) {
+      const par = vnodeA.parent;
+      for (let i = 0, len = par.children.length; i < len; i++) {
+        const canPush = par.children[i] === vnodeA || par.children[i] === vnodeB;
+        if ( ! canPush) continue;
+        arr.push(par.children[i]);
+        if (arr.length) break;
+      }
+    } else {
+      //TODO
+      let parA = vnodeA;
+      let parB = vnodeB;
+      while(parA.parent) {
+        while(parB.parent) {
+          if (parA === parB) break;
+          parB = parB.parent;
+        }
+        if (parA === parB) break;
+        parA = parA.parent;
+      }
+    }
+    return arr;
   }
 
   public static splitNode(vnode: VNode, offset: number) {
@@ -63,6 +112,16 @@ export class VNode {
   }
 
   public static mergeNode(vnodes: VNode[]) {
-    
+    let canMerge = true;
+    const par = vnodes[0].parent;
+    const firstIndex = par.children.indexOf(vnodes[0]);
+    for (let i = 1, len = vnodes.length; i < len; i++) {
+      if (vnodes[i].parent !== par || vnodes[i] !== par.children[firstIndex + 1]) {
+        canMerge = false;
+        break;
+      }
+    }
+    if ( ! canMerge) return;
+    //TODO
   }
 }
