@@ -15,6 +15,7 @@ export interface VSelectionData {
   isCollapsed?: boolean
   rangeCount?: number
 }
+
 /**
  *  
  * 

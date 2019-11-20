@@ -89,8 +89,8 @@ export class VNode {
       for (let i = 0, len = par.children.length; i < len; i++) {
         const isAB = par.children[i] === vnodeA || par.children[i] === vnodeB;
         if (isAB && ! pushing) pushing = true;
-        arr.push(par.children[i]);
-        if (isAB && pushing) break;
+        pushing && arr.push(par.children[i]);
+        if (isAB && pushing && arr.length > 1) break;
       }
     } else {
       const ccp = VNode.ccp(vnodeA, vnodeB);
