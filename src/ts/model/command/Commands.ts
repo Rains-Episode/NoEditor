@@ -28,4 +28,8 @@ export class Commands {
     vnode.style.appendStyle(CommandsType.italic, true);
   }
 
+  static underline(vnode: VNode) {
+    vnode.style.appendStyle(CommandsType.underline, true);
+  }
+
 }

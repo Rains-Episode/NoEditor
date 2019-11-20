@@ -3,12 +3,13 @@ import { VNode } from "../content/VNode";
 import { VContent } from "../content/VContent";
 import { VStyleData, VStyle } from "../content/VStyle";
 import { VSelection, VSelectionData } from "../selection/VSelection";
+import { CommandType } from "../command/Commands";
 
 
 export class VEditor {
 
   public content: VContent = new VContent();
-  public currStyle: VStyleData = {};
+  public currStyle: VStyle = new VStyle();
   public selection: VSelection = new VSelection();
 
   constructor() {
@@ -32,6 +33,10 @@ export class VEditor {
   public onselectionchange(sel: VSelectionData) {
     this.selection.setSelection(sel);
     this._updateStyleBySelection();
+  }
+
+  public execCommand(command: CommandType) {
+    
   }
 
   private _updateStyleBySelection() {

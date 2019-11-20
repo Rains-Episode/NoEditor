@@ -58,46 +58,43 @@ export class VNode {
   }
 
 
+  public static getTreeLen(vnode: VNode): number {
+    let len = 0;
+    while (vnode = vnode.parent) len++;
+    return len;
+  }
 
-  public static findCommonParent(vnodeA: VNode, vnodeB: VNode): VNode {
-    const getTreeLen = (vnode: VNode) => {
-      let len = 0;
-      let par = vnode;
-      while(par = vnode.parent) len++;
-      return len;
-    }
-    let lenA = getTreeLen(vnodeA);
-    let lenB = getTreeLen(vnodeB);
+  /**
+   * closest common parent
+   * @param vnodeA 
+   * @param vnodeB 
+   */
+  public static ccp(vnodeA: VNode, vnodeB: VNode): VNode {
+    let lenA = VNode.getTreeLen(vnodeA);
+    let lenB = VNode.getTreeLen(vnodeB);
     for (; lenA > lenB; lenA--) vnodeA = vnodeA.parent;
     for (; lenB > lenA; lenB--) vnodeB = vnodeB.parent;
-    // while() {
-      
-    // }
-    return;
+    while (vnodeA && vnodeB && vnodeA !== vnodeB) {
+      vnodeA = vnodeA.parent;
+      vnodeB = vnodeB.parent;
+    }
+    return vnodeA;
   }
 
   public static getNodesBetween2Node(vnodeA: VNode, vnodeB: VNode): VNode[] {
     const arr = [];
     if (vnodeA.parent === vnodeB.parent) {
       const par = vnodeA.parent;
+      let pushing = false;
       for (let i = 0, len = par.children.length; i < len; i++) {
-        const canPush = par.children[i] === vnodeA || par.children[i] === vnodeB;
-        if ( ! canPush) continue;
+        const isAB = par.children[i] === vnodeA || par.children[i] === vnodeB;
+        if (isAB && ! pushing) pushing = true;
         arr.push(par.children[i]);
-        if (arr.length) break;
+        if (isAB && pushing) break;
       }
     } else {
+      const ccp = VNode.ccp(vnodeA, vnodeB);
       //TODO
-      let parA = vnodeA;
-      let parB = vnodeB;
-      while(parA.parent) {
-        while(parB.parent) {
-          if (parA === parB) break;
-          parB = parB.parent;
-        }
-        if (parA === parB) break;
-        parA = parA.parent;
-      }
     }
     return arr;
   }

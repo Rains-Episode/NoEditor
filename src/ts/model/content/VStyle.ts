@@ -25,4 +25,8 @@ export class VStyle {
     if ( ! this.hasStyle(key)) return;
     delete this._data[key];
   }
+
+  public static equals(vstyleA: VStyle, vstyleB: VStyle) {
+    return JSON.stringify(vstyleA.data) === JSON.stringify(vstyleB.data);
+  }
 }
