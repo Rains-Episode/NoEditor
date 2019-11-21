@@ -3,7 +3,7 @@ import { VNode } from "../content/VNode";
 import { VContent } from "../content/VContent";
 import { VStyleData, VStyle } from "../content/VStyle";
 import { VSelection, VSelectionData } from "../selection/VSelection";
-import { CommandType } from "../command/Commands";
+import { CommandType, execCommand } from "../command/Commands";
 
 
 export class VEditor {
@@ -35,8 +35,18 @@ export class VEditor {
     this._updateStyleBySelection();
   }
 
-  public execCommand(command: CommandType) {
-    
+  public execCommand(cmd: CommandType) {
+    const sel = this.selection;
+    if (sel.isCollapsed) {
+      //TODO
+    } else if (sel.anchorNode === sel.focusNode) {
+      if (sel.anchorOffset === sel.anchorNode.text.length || 
+          sel.focusOffset === sel.anchorNode.text.length) {
+            // VNode.splitNode()
+      }
+    }
+    //TODO
+    execCommand(cmd, this.selection.anchorNode);
   }
 
   private _updateStyleBySelection() {

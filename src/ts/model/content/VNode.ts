@@ -9,7 +9,7 @@ export class VNode {
   public parent: VNode;
   public children: Array<VNode> = [];
 
-  public style: VStyle;
+  public style: VStyle = new VStyle();
   
   private _text: string = '';
   private _key: string
@@ -43,9 +43,9 @@ export class VNode {
     Pool.recoverByClass(vnode);
   }
 
-  public appendChild(child: VNode): void {
-    child.parent = this;
-    this.children.push(child);
+  public appendChild(vnode: VNode, index?: number): void {
+    vnode.parent = this;
+    index === void 0 ? this.children.push(vnode) : this.children.splice(index, 0, vnode);
   }
 
   public appendTo(vnode: VNode) {
@@ -81,9 +81,16 @@ export class VNode {
     return vnodeA;
   }
 
+  /**
+   * 获取两个节点之间的节点 A在前, B在后
+   * @param vnodeA 
+   * @param vnodeB
+   */
   public static getNodesBetween2Node(vnodeA: VNode, vnodeB: VNode): VNode[] {
     const arr = [];
-    if (vnodeA.parent === vnodeB.parent) {
+    if (vnodeA === vnodeB) {
+      arr.push(vnodeA);
+    } else if (vnodeA.parent === vnodeB.parent) {
       const par = vnodeA.parent;
       let pushing = false;
       for (let i = 0, len = par.children.length; i < len; i++) {
@@ -92,9 +99,41 @@ export class VNode {
         pushing && arr.push(par.children[i]);
         if (isAB && pushing && arr.length > 1) break;
       }
+    } else if (vnodeA === vnodeB.parent) {
+      VNode.getNodesBetween2Node(vnodeA.children[0], vnodeB);
+    } else if (vnodeA.parent === vnodeB) {
+      VNode.getNodesBetween2Node(vnodeA, vnodeB.children[vnodeB.children.length - 1]);
     } else {
-      const ccp = VNode.ccp(vnodeA, vnodeB);
-      //TODO
+      let parA = vnodeA;
+      let parB = vnodeB;
+      let lenA = VNode.getTreeLen(parA);
+      let lenB = VNode.getTreeLen(parB);
+      for (; lenA > lenB; lenA--) parA = parA.parent;
+      for (; lenB > lenA; lenB--) parB = parB.parent;
+      while (parA && parB && parA.parent !== parB.parent) {
+        parA = parA.parent;
+        parB = parB.parent;
+      }
+      const ccp = parA.parent;
+      let first: VNode;
+      for (let i = 0, len = ccp.children.length; i < len; i++) 
+        if (ccp.children[i] === parA || ccp.children[i] === parB) {
+          first = ccp.children[i];
+          break;
+        }
+      let chA = vnodeA;
+      let chB = vnodeB;
+      if (first === parA) {
+        while (chA !== parA) {
+          arr.push(VNode.getNodesBetween2Node(chA, chA.parent));
+          chA = chA.parent;
+        }
+      } else {
+        while (chB !== parB) {
+          arr.push(VNode.getNodesBetween2Node(chB, chB.parent));
+          chB = chB.parent;
+        }
+      }
     }
     return arr;
   }
@@ -105,6 +144,7 @@ export class VNode {
     const text2 = vnode.text.slice(offset);
     vnode.text = text1;
     const newNode = VNode.create();
+    vnode.parent.appendChild(newNode, vnode.parent.children.indexOf(vnode));
     newNode.text = text2;
   }
 

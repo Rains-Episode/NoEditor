@@ -5,7 +5,7 @@ export type VStyleData = Record<string, any>;
 
 export class VStyle {
 
-  private _data: VStyleData;
+  private _data: VStyleData = {};
   public get data(): VStyleData { return this._data; }
 
   public clearStyle() {

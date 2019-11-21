@@ -1,5 +1,4 @@
-import { VNode } from "../content/VNode"
-import { VStyle } from "../content/VStyle";
+import { VNode } from "../content/VNode";
 
 export type CommandType = 
     'clear'
@@ -14,22 +13,22 @@ export const CommandsType: Record<CommandType, CommandType> = {
   underline: 'underline'
 }
 
-export class Commands {
-  
-  static clear(vnode: VNode) {
+export const execCommand = (cmd: CommandType, vnode: VNode) => {
+  if ( ! CommandsType[cmd]) return;
+  Commands[cmd](vnode);
+}
+
+export const Commands: Record<CommandType, (vnode: VNode) => void> = {
+  clear: (vnode: VNode) => {
     vnode.style.clearStyle();
-  }
-
-  static bold(vnode: VNode) {
+  },
+  bold: (vnode: VNode) => {
     vnode.style.appendStyle(CommandsType.bold, true);
-  }
-
-  static italic(vnode: VNode) {
+  },
+  italic: (vnode: VNode) => {
     vnode.style.appendStyle(CommandsType.italic, true);
-  }
-
-  static underline(vnode: VNode) {
+  },
+  underline: (vnode: VNode) => {
     vnode.style.appendStyle(CommandsType.underline, true);
   }
-
 }

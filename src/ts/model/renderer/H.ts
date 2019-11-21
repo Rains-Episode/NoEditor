@@ -82,10 +82,17 @@ export class $h {
   }
 
   static renderNode(vnode: VNode) {
-    const ele = vnode.entity || $domApi.createElement('div');
+    const ele = (vnode.entity || $domApi.createElement('div')) as HTMLElement;
     vnode.entity || (vnode.entity = ele);
     ele.textContent = vnode.text;
     ele[$h.__VNODE_SIGN] = vnode;
+    let style = '';
+    for (let i in vnode.style.data) {
+      const mapping = VNodeStyleMap[i];
+      if ( ! mapping) continue;
+      style += `${mapping};`; 
+    }
+    ele.setAttribute('style', style);
     for (let i = 0; i < vnode.children.length; i++) 
       ele.appendChild($h.renderNode(vnode.children[i]));
     return ele;
@@ -94,4 +101,11 @@ export class $h {
 
 export const VNodeElementMap = {
   
+}
+
+
+export const VNodeStyleMap = {
+  'bold': 'font-weight: bold',
+  'italic': 'font-style: italic',
+  'underline': 'text-decoration: underline'
 }

@@ -1,14 +1,18 @@
 import { VEditor } from "../model/editor/VEditor";
 import { $h, $domApi } from "../model/renderer/H";
 import { VSelectionData } from "../model/selection/VSelection";
+import { CommandType } from "../model/command/Commands";
+import { Menus } from "./Menus";
 
 export interface EditorOptions {
   rows?: number,
   cols?: number,
+  menus?: Record<CommandType, any>,
 }
 
 export class Editor {
   private _body: HTMLElement;
+  private _menu: HTMLElement;
   private _soul: VEditor = new VEditor();
 
   private _isNeedRender: boolean = true;
@@ -16,29 +20,58 @@ export class Editor {
 
   private _options: EditorOptions = {
     rows: 10,
-    cols: 30
+    cols: 30,
+    menus: {
+      clear: true,
+      bold: true,
+      italic: true,
+      underline: true
+    }
   }
 
   public get body(): HTMLElement { return this._body; }
+  public get menu(): HTMLElement { return this._menu; }
   public get soul(): VEditor { return this._soul; }
 
   constructor(options?: EditorOptions) {
     for (let i in options) this._options[i] = options[i];
     const ops = this._options;
-    const div = document.createElement('div');
+    const divBody = $domApi.createElement('div');
     //TODO set editor style
-    div.contentEditable = 'true';
-    div.id = 'no-editor';
-    div.style.border = '1px solid #aaa';
-    div.style.width = `${ops.cols}rem`;
-    div.style.height = `${ops.rows}rem`;
-    this._body = div;
+    divBody.contentEditable = 'true';
+    divBody.id = 'no-editor';
+    divBody.style.border = '1px solid #aaa';
+    divBody.style.width = `${ops.cols}rem`;
+    divBody.style.height = `${ops.rows}rem`;
+    this._body = divBody;
+
+    const divMenu = $domApi.createElement('div');
+    for (let i in ops.menus) {
+      const btn = $domApi.createElement('button');
+      btn.textContent = i;
+      divMenu.appendChild(btn);
+      btn.onclick = () => {
+        this.execCommand(i as CommandType)
+      }
+    }
+    this._menu = divMenu;
+
     this._render();
     this.onListener();
   }
 
   public appendTo(parent: HTMLElement): HTMLElement {
     return parent.appendChild(this._body);
+  }
+
+  public appendMenuTo(parent: HTMLElement): HTMLElement {
+    return parent.appendChild(this._menu);
+  }
+
+  public execCommand(cmd: CommandType) {
+    this._soul.execCommand(cmd);
+    this._isNeedRender = true;
+    this._render();
   }
 
   private get _isFocusOnEditor(): boolean {
@@ -59,17 +92,17 @@ export class Editor {
   }
 
   private _onselectstart(e: Event) {
-    console.log('select start', window.getSelection());
+    // console.log('select start', window.getSelection());
     this._isSelectStarted = true;
   }
 
   private _onselectend(e?: MouseEvent) {
     document.onmouseout = void 0;
-    console.log('select end')
+    // console.log('select end')
     if ( ! this._isSelectStarted) return;
     this._isSelectStarted = false;
     const sel = window.getSelection();
-    console.log('rsel : ', sel);
+    // console.log('rsel : ', sel);
     let vsel: VSelectionData;
     if (this._isFocusOnEditor) {
       vsel = {
@@ -95,7 +128,7 @@ export class Editor {
       }
     }
     this._soul.onselectionchange(vsel);
-    console.log('vsel : ', vsel);
+    // console.log('vsel : ', vsel);
     this._render();
   }
 
