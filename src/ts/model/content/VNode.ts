@@ -138,14 +138,22 @@ export class VNode {
     return arr;
   }
 
-  public static splitNode(vnode: VNode, offset: number) {
-    if ( ! vnode.text || ! offset || offset >= vnode.text.length) return;
-    const text1 = vnode.text.slice(0, offset);
-    const text2 = vnode.text.slice(offset);
-    vnode.text = text1;
-    const newNode = VNode.create();
-    vnode.parent.appendChild(newNode, vnode.parent.children.indexOf(vnode));
-    newNode.text = text2;
+  public static splitNode(vnode: VNode, offsets: number[]) {
+    if ( ! vnode.text || vnode.text.length <= 1) return;
+    offsets.sort((a, b) => a - b);
+    const arr: string[] = [];
+    for (let i = 0; i < offsets.length; i++) {
+      if (offsets[i] <= 0) continue;
+      const text = vnode.text.slice(offsets[i - 1] || 0, offsets[i] >= vnode.text.length ? void 0 : offsets[i]);
+      text && arr.push(text);
+    }
+    vnode.text = arr[0];
+    const index = vnode.parent.children.indexOf(vnode);
+    for (let i = 1; i < arr.length; i++) {
+      const newNode = VNode.create();
+      newNode.text = arr[i];
+      vnode.parent.appendChild(newNode, index + i);
+    }
   }
 
   public static mergeNode(vnodes: VNode[]) {

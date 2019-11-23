@@ -40,9 +40,12 @@ export class VEditor {
     if (sel.isCollapsed) {
       //TODO
     } else if (sel.anchorNode === sel.focusNode) {
-      if (sel.anchorOffset === sel.anchorNode.text.length || 
-          sel.focusOffset === sel.anchorNode.text.length) {
-            // VNode.splitNode()
+      const vnode = sel.anchorNode;
+      if (sel.anchorOffset === vnode.text.length || 
+          sel.focusOffset === vnode.text.length) {
+        execCommand(cmd, vnode);
+      } else {
+        VNode.splitNode(vnode, []);
       }
     }
     //TODO
