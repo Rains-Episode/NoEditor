@@ -2,7 +2,6 @@ import { VEditor } from "../model/editor/VEditor";
 import { $h, $domApi } from "../model/renderer/H";
 import { VSelectionData } from "../model/selection/VSelection";
 import { CommandType } from "../model/command/Commands";
-import { Menus } from "./Menus";
 
 export interface EditorOptions {
   rows?: number,
@@ -81,7 +80,7 @@ export class Editor {
 
   private _oninput(e: InputEvent) {
     const sel = window.getSelection();
-    this._soul.oninput(sel.anchorNode.textContent);
+    this._soul.oninput(e.data);
     this._isNeedRender = true;
     this._isSelectStarted = true;
     this._onselectend();
@@ -102,13 +101,13 @@ export class Editor {
     if ( ! this._isSelectStarted) return;
     this._isSelectStarted = false;
     const sel = window.getSelection();
-    // console.log('rsel : ', sel);
+    console.log('rsel : ', sel);
     let vsel: VSelectionData;
     if (this._isFocusOnEditor) {
       vsel = {
-        anchorNode: this._soul.content,
+        anchorNode: this._soul.$root,
         anchorOffset: sel.anchorOffset,
-        focusNode: this._soul.content,
+        focusNode: this._soul.$root,
         focusOffset: sel.focusOffset,
         isCollapsed: sel.isCollapsed,
         rangeCount: sel.rangeCount
@@ -128,7 +127,7 @@ export class Editor {
       }
     }
     this._soul.onselectionchange(vsel);
-    // console.log('vsel : ', vsel);
+    console.log('vsel : ', vsel);
     this._render();
   }
 
@@ -137,7 +136,7 @@ export class Editor {
     console.log('re render');
     this._isNeedRender = false;
     this._body.textContent = '';
-    this._body.appendChild($h.renderNode(this._soul.content));
+    this._body.appendChild($h.renderNode(this._soul.$root));
     this._renderSelection();
   }
 

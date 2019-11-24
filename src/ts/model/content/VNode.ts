@@ -4,7 +4,7 @@ import { Pool } from "../utils/Pool";
 let $VNodeKey: number = 0;
 
 export class VNode {
-
+  
   public entity: any;
   public parent: VNode;
   public children: Array<VNode> = [];
@@ -49,7 +49,7 @@ export class VNode {
   }
 
   public appendTo(vnode: VNode) {
-    //TODO
+    vnode.appendChild(this);
   }
 
   public remove(): void {
@@ -138,22 +138,26 @@ export class VNode {
     return arr;
   }
 
-  public static splitNode(vnode: VNode, offsets: number[]) {
-    if ( ! vnode.text || vnode.text.length <= 1) return;
+  public static splitNode(vnode: VNode, offsets: number[]): VNode[] {
+    const str = vnode.text;
+    if ( ! str || str.length <= 1) return;
     offsets.sort((a, b) => a - b);
-    const arr: string[] = [];
+    const arr: string[] = [str.slice(0, offsets[0] <= 0 ? void 0 : offsets[0])];
     for (let i = 0; i < offsets.length; i++) {
       if (offsets[i] <= 0) continue;
-      const text = vnode.text.slice(offsets[i - 1] || 0, offsets[i] >= vnode.text.length ? void 0 : offsets[i]);
+      const text = str.slice(offsets[i], offsets[i + 1]);
       text && arr.push(text);
     }
     vnode.text = arr[0];
+    const nodesArr = [vnode];
     const index = vnode.parent.children.indexOf(vnode);
     for (let i = 1; i < arr.length; i++) {
       const newNode = VNode.create();
+      nodesArr.push(newNode);
       newNode.text = arr[i];
       vnode.parent.appendChild(newNode, index + i);
     }
+    return nodesArr;
   }
 
   public static mergeNode(vnodes: VNode[]) {

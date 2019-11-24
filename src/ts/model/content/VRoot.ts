@@ -1,6 +1,7 @@
 import { VNode } from "./VNode";
-export class VContent extends VNode {
+export class VRoot extends VNode {
   constructor() { 
     super();
+    
   }
 }

@@ -1,6 +1,6 @@
 import { VNode } from "../content/VNode";
 
-import { VContent } from "../content/VContent";
+import { VRoot } from "../content/VRoot";
 import { VStyleData, VStyle } from "../content/VStyle";
 import { VSelection, VSelectionData } from "../selection/VSelection";
 import { CommandType, execCommand } from "../command/Commands";
@@ -8,7 +8,9 @@ import { CommandType, execCommand } from "../command/Commands";
 
 export class VEditor {
 
-  public content: VContent = new VContent();
+  private _$root: VRoot = new VRoot();
+  public get $root(): VRoot { return this._$root };
+
   public currStyle: VStyle = new VStyle();
   public selection: VSelection = new VSelection();
 
@@ -17,17 +19,24 @@ export class VEditor {
   }
 
   public oninput(data: string) {
-    const anchor = this.selection.anchorNode;
-    console.log('anchor: ', anchor, 'data: ', data);
-    if ( ! anchor) {
-      //TODO
-      return;
+    const aNode = this.selection.anchorNode;
+    const aOffset = this.selection.anchorOffset;
+    console.log('anchor: ', aNode, 'data: ', data);
+    if ( ! aNode) return;
+    if (this.selection.isCollapsed) {
+      //仅有光标情况
+      let str = '';
+      if ( ! aNode.text.length) str = data;
+      else if (aOffset >= aNode.text.length) str = `${aNode.text}${data}`
+      else {
+        for (let i = 0; i < aNode.text.length; i++) {
+          str += `${i === aOffset ? data : ''}${aNode.text[i]}`
+        }
+      }
+      aNode.text = str;
+    } else {
+      //TODO 选中了一部分区域情况
     }
-    this.content.text = data;
-    // if ( ! VStyle.equals(this.currStyle, anchor.style)) {
-    //   //TODO
-    // }
-    
   }
 
   public onselectionchange(sel: VSelectionData) {
@@ -45,11 +54,12 @@ export class VEditor {
           sel.focusOffset === vnode.text.length) {
         execCommand(cmd, vnode);
       } else {
-        VNode.splitNode(vnode, []);
+        const nodes = VNode.splitNode(vnode, [sel.anchorOffset, sel.focusOffset]);
+        console.log(nodes);
       }
+    } else {
+
     }
-    //TODO
-    execCommand(cmd, this.selection.anchorNode);
   }
 
   private _updateStyleBySelection() {
