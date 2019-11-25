@@ -14,7 +14,7 @@ export class $domApi {
     return focus === ele || ($domApi.isTextNode(focus) && focus.parentElement === ele);
   }
 
-  // ===== 4 selection ===== 
+  // ===== for selection ===== 
   static setSelection(anchorNode: Node, anchorOffset: number, focusNode: Node, focusOffset: number) { 
     const sel = window.getSelection();
     sel.removeAllRanges();
@@ -82,7 +82,7 @@ export class $h {
   }
 
   static renderNode(vnode: VNode) {
-    const ele = (vnode.entity || $domApi.createElement('div')) as HTMLElement;
+    const ele = (vnode.entity || $domApi.createElement('span')) as HTMLElement;
     vnode.entity || (vnode.entity = ele);
     ele.textContent = vnode.text;
     ele[$h.__VNODE_SIGN] = vnode;
@@ -92,7 +92,7 @@ export class $h {
       if ( ! mapping) continue;
       style += `${mapping};`; 
     }
-    ele.setAttribute('style', style);
+    style && ele.setAttribute('style', style);
     for (let i = 0; i < vnode.children.length; i++) 
       ele.appendChild($h.renderNode(vnode.children[i]));
     return ele;

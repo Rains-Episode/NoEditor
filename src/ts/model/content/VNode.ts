@@ -35,6 +35,7 @@ export class VNode {
 
   public static create(): VNode {
     const vnode = Pool.getByClass(VNode) as VNode;
+    vnode.text = '';
     vnode.resetKey()
     return vnode;
   }

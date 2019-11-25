@@ -14,9 +14,6 @@ export class Editor {
   private _menu: HTMLElement;
   private _soul: VEditor = new VEditor();
 
-  private _isNeedRender: boolean = true;
-  private _isSelectStarted: boolean = false;
-
   private _options: EditorOptions = {
     rows: 10,
     cols: 30,
@@ -55,7 +52,7 @@ export class Editor {
     }
     this._menu = divMenu;
 
-    this._render();
+    this._renderNodes();
     this.onListener();
   }
 
@@ -69,8 +66,7 @@ export class Editor {
 
   public execCommand(cmd: CommandType) {
     this._soul.execCommand(cmd);
-    this._isNeedRender = true;
-    this._render();
+    this._renderNodes();
   }
 
   private get _isFocusOnEditor(): boolean {
@@ -81,25 +77,19 @@ export class Editor {
   private _oninput(e: InputEvent) {
     const sel = window.getSelection();
     this._soul.oninput(e.data);
-    this._isNeedRender = true;
-    this._isSelectStarted = true;
-    this._onselectend();
+    this._renderNodes();
+    this._renderSelection();
   }
   
   private _onmousedown(e: MouseEvent) {
-    document.onmouseout = (e: MouseEvent) => { this._onselectend(e) }
-  }
-
-  private _onselectstart(e: Event) {
-    // console.log('select start', window.getSelection());
-    this._isSelectStarted = true;
+    document.onmouseup = (e: MouseEvent) => { this._onselectend(e); }
+    document.onmouseout = (e: MouseEvent) => { this._onselectend(e) };
   }
 
   private _onselectend(e?: MouseEvent) {
+    document.onmouseup = void 0;
     document.onmouseout = void 0;
-    // console.log('select end')
-    if ( ! this._isSelectStarted) return;
-    this._isSelectStarted = false;
+    console.log('================= select end ==================');
     const sel = window.getSelection();
     console.log('rsel : ', sel);
     let vsel: VSelectionData;
@@ -128,16 +118,12 @@ export class Editor {
     }
     this._soul.onselectionchange(vsel);
     console.log('vsel : ', vsel);
-    this._render();
   }
 
-  private _render() {
-    if ( ! this._isNeedRender) return;
+  private _renderNodes() {
     console.log('re render');
-    this._isNeedRender = false;
     this._body.textContent = '';
     this._body.appendChild($h.renderNode(this._soul.$root));
-    this._renderSelection();
   }
 
   private _renderSelection() {
@@ -148,8 +134,6 @@ export class Editor {
 
   public onListener() {
     this._body.oninput = (e: InputEvent) => { this._oninput(e) };
-    document.onselectstart = (e: Event) => { this._onselectstart(e); }
     document.onmousedown = (e: MouseEvent) => { this._onmousedown(e); }
-    document.onmouseup = (e: MouseEvent) => { this._onselectend(e); }
   }
 }

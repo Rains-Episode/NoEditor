@@ -40,6 +40,12 @@ export class VSelection {
     
   }
 
+  public focusOn(vnode: VNode, offset: number): void {
+    this._anchorNode = this._focusNode = vnode;
+    this._anchorOffset = this._focusOffset = offset;
+    this._isCollapsed = true;
+  }
+
   public setSelection(sel: VSelectionData): void {
     this._anchorNode = sel.anchorNode;
     this._anchorOffset = sel.anchorOffset;

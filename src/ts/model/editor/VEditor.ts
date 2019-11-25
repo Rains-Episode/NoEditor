@@ -24,18 +24,31 @@ export class VEditor {
     console.log('anchor: ', aNode, 'data: ', data);
     if ( ! aNode) return;
     if (this.selection.isCollapsed) {
-      //仅有光标情况
-      let str = '';
-      if ( ! aNode.text.length) str = data;
-      else if (aOffset >= aNode.text.length) str = `${aNode.text}${data}`
-      else {
-        for (let i = 0; i < aNode.text.length; i++) {
-          str += `${i === aOffset ? data : ''}${aNode.text[i]}`
+      // 仅有光标情况
+      if (aNode === this._$root) {
+        // 如果focus on根节点 那就增加新的节点
+        const vnode = VNode.create();
+        vnode.text = data;
+        this._$root.appendChild(vnode);
+        this.selection.focusOn(vnode, vnode.text.length)
+      } else {
+        let str = '';
+        // case 1: focus的节点还没有内容
+        // case 2: focus节点的内容的结尾
+        // case 3: focus节点的内容的中间
+        if ( ! aNode.text.length) str = data;
+        else if (aOffset >= aNode.text.length) str = `${aNode.text}${data}`
+        else {
+          for (let i = 0; i < aNode.text.length; i++) {
+            str += `${i === aOffset ? data : ''}${aNode.text[i]}`
+          }
         }
+        aNode.text = str;
+        this.selection.focusOn(aNode, aOffset + 1);
       }
-      aNode.text = str;
     } else {
       //TODO 选中了一部分区域情况
+
     }
   }
 
