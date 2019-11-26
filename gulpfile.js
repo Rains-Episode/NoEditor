@@ -18,7 +18,7 @@ const build = () => {
 
 const watch = () => {
 	gulp.watch('./src/ts/**/*.ts', {
-		delay: 1000
+		awaitWriteFinish: true
 	}, build);
 }
 

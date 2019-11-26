@@ -1,6 +1,3 @@
-import { VNode } from "./VNode";
-import { VRangeData } from "../selection/VSelection";
-
 export type VStyleData = Record<string, any>;
 
 export class VStyle {
@@ -24,6 +21,22 @@ export class VStyle {
   public removeStyle(key: string) {
     if ( ! this.hasStyle(key)) return;
     delete this._data[key];
+  }
+
+  public static getCommonStyle(vstyles: VStyle[]) {
+    const com = {};
+    for (let i = 0; i < vstyles.length; i++) {
+      for (let j in vstyles[i].data) {
+        const obj = {};
+        obj[j] = vstyles[i].data[j];
+        const key = JSON.stringify(obj);
+        com[key] ? com[key]++ : (com[key] = 1);
+      }
+    }
+    const arr = [];
+    for (let i in com)
+      if (com[i] >= vstyles.length) arr.push(JSON.parse(i));
+    return arr;
   }
 
   public static equals(vstyleA: VStyle, vstyleB: VStyle) {

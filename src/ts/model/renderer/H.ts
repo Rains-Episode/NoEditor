@@ -14,8 +14,15 @@ export class $domApi {
     return focus === ele || ($domApi.isTextNode(focus) && focus.parentElement === ele);
   }
 
+  static getTextChild(ele: Element | Node) {
+    if ($domApi.isTextNode(ele)) return ele;
+    for (let i = 0; i < ele.childNodes.length; i++) if ($domApi.isTextNode(ele.childNodes[i])) return ele.childNodes[i];
+  }
+
   // ===== for selection ===== 
-  static setSelection(anchorNode: Node, anchorOffset: number, focusNode: Node, focusOffset: number) { 
+  static setSelection(anchorNode: Node, anchorOffset: number, focusNode: Node, focusOffset: number): void {
+    ! $domApi.isTextNode(anchorNode) && anchorOffset && (anchorOffset = 0);
+    ! $domApi.isTextNode(focusNode) && focusOffset && (focusOffset = 0);
     const sel = window.getSelection();
     sel.removeAllRanges();
     const range = document.createRange();
@@ -23,14 +30,11 @@ export class $domApi {
     range.setEnd(focusNode, focusOffset);
     sel.addRange(range);
   }
-  static setCaretPos(node: Node, pos: number) {
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    const range = document.createRange();
-    range.setStart(node, pos);
-    range.collapse();
-    sel.addRange(range);
+  static setCaretPos(node: Node, pos: number): void {
+    $domApi.setSelection(node, pos, node, pos);
   }
+
+
 
 
   static setStyle() {
@@ -92,7 +96,7 @@ export class $h {
       if ( ! mapping) continue;
       style += `${mapping};`; 
     }
-    style && ele.setAttribute('style', style);
+    style ? ele.setAttribute('style', style) : ele.removeAttribute('style');
     for (let i = 0; i < vnode.children.length; i++) 
       ele.appendChild($h.renderNode(vnode.children[i]));
     return ele;

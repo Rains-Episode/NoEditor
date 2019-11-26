@@ -68,6 +68,9 @@ export class VEditor {
         execCommand(cmd, vnode);
       } else {
         const nodes = VNode.splitNode(vnode, [sel.anchorOffset, sel.focusOffset]);
+        const node = nodes[Math.ceil(nodes.length / 2) - 1];
+        execCommand(cmd, node);
+        this.selection.selectOn(node);
         console.log(nodes);
       }
     } else {
@@ -76,9 +79,12 @@ export class VEditor {
   }
 
   private _updateStyleBySelection() {
+    console.log('=== update style by selection ===');
     const sel = this.selection;
     if ( ! sel.anchorNode || ! sel.focusNode) return;
+    const nodes = VNode.getNodesBetween2Node(sel.anchorNode, sel.focusNode);
     
+    console.log('selected nodes : ', nodes);
   }
 
   public setStyle() {

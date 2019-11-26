@@ -52,7 +52,7 @@ export class Editor {
     }
     this._menu = divMenu;
 
-    this._renderNodes();
+    this._rerender();
     this.onListener();
   }
 
@@ -66,7 +66,7 @@ export class Editor {
 
   public execCommand(cmd: CommandType) {
     this._soul.execCommand(cmd);
-    this._renderNodes();
+    this._rerender();
   }
 
   private get _isFocusOnEditor(): boolean {
@@ -77,18 +77,15 @@ export class Editor {
   private _oninput(e: InputEvent) {
     const sel = window.getSelection();
     this._soul.oninput(e.data);
-    this._renderNodes();
-    this._renderSelection();
+    this._rerender();
   }
   
   private _onmousedown(e: MouseEvent) {
-    document.onmouseup = (e: MouseEvent) => { this._onselectend(e); }
-    document.onmouseout = (e: MouseEvent) => { this._onselectend(e) };
+    document.onmouseup = (e: MouseEvent) => { console.log('window mouse up'); this._onselectend(e); }
   }
 
   private _onselectend(e?: MouseEvent) {
     document.onmouseup = void 0;
-    document.onmouseout = void 0;
     console.log('================= select end ==================');
     const sel = window.getSelection();
     console.log('rsel : ', sel);
@@ -99,7 +96,6 @@ export class Editor {
         anchorOffset: sel.anchorOffset,
         focusNode: this._soul.$root,
         focusOffset: sel.focusOffset,
-        isCollapsed: sel.isCollapsed,
         rangeCount: sel.rangeCount
       }
     } else {
@@ -112,7 +108,6 @@ export class Editor {
           ? $h.getVNodeByEle(sel.focusNode.parentElement)
           : $h.getVNodeByEle(sel.focusNode),
         focusOffset: sel.focusOffset,
-        isCollapsed: sel.isCollapsed,
         rangeCount: sel.rangeCount
       }
     }
@@ -120,8 +115,13 @@ export class Editor {
     console.log('vsel : ', vsel);
   }
 
-  private _renderNodes() {
+  private _rerender() {
     console.log('re render');
+    this._renderNodes();
+    this._renderSelection();
+  }
+
+  private _renderNodes() {
     this._body.textContent = '';
     this._body.appendChild($h.renderNode(this._soul.$root));
   }
@@ -129,7 +129,7 @@ export class Editor {
   private _renderSelection() {
     const vsel = this._soul.selection;
     if ( ! vsel.anchorNode || ! vsel.anchorNode.entity || ! vsel.anchorNode.entity.childNodes || ! vsel.anchorNode.entity.childNodes[0]) return;
-    $domApi.setCaretPos(vsel.anchorNode.entity.childNodes[0], vsel.anchorOffset);
+    $domApi.setSelection($domApi.getTextChild(vsel.anchorNode.entity), vsel.anchorOffset, $domApi.getTextChild(vsel.focusNode.entity), vsel.focusOffset);
   }
 
   public onListener() {

@@ -83,7 +83,7 @@ export class VNode {
   }
 
   /**
-   * 获取两个节点之间的节点 A在前, B在后
+   * 获取两个节点之间的节点
    * @param vnodeA 
    * @param vnodeB
    */
@@ -135,6 +135,10 @@ export class VNode {
           chB = chB.parent;
         }
       }
+      const nodesBetweenAB = VNode.getNodesBetween2Node(parA, parB);
+      nodesBetweenAB.shift();
+      nodesBetweenAB.pop();
+      arr.push(nodesBetweenAB);
     }
     return arr;
   }
@@ -142,11 +146,25 @@ export class VNode {
   public static splitNode(vnode: VNode, offsets: number[]): VNode[] {
     const str = vnode.text;
     if ( ! str || str.length <= 1) return;
-    offsets.sort((a, b) => a - b);
-    const arr: string[] = [str.slice(0, offsets[0] <= 0 ? void 0 : offsets[0])];
+    const ofs = [];
+    // <=> offsets.filter(v => v > 0);
+    // <=> offsets.sort((a, b) => a - b);
     for (let i = 0; i < offsets.length; i++) {
       if (offsets[i] <= 0) continue;
-      const text = str.slice(offsets[i], offsets[i + 1]);
+      ofs.push(offsets[i]);
+      for (let j = ofs.length - 1; j >= 0 ; j--) {
+        if (ofs[j] < ofs[j] - 1) {
+          const t = ofs[j];
+          ofs[j] = ofs[j - 1];
+          ofs[j - 1] = t;
+        }
+      }
+    }
+    if ( ! ofs.length) return;
+    const arr: string[] = [str.slice(0, ofs[0])];
+    for (let i = 0; i < ofs.length; i++) {
+      if (ofs[i] <= 0) continue;
+      const text = str.slice(ofs[i], ofs[i + 1]);
       text && arr.push(text);
     }
     vnode.text = arr[0];
