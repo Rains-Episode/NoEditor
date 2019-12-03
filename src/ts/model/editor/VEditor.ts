@@ -63,8 +63,8 @@ export class VEditor {
       //TODO
     } else if (sel.anchorNode === sel.focusNode) {
       const vnode = sel.anchorNode;
-      if (sel.anchorOffset === vnode.text.length || 
-          sel.focusOffset === vnode.text.length) {
+      if ((sel.anchorOffset === vnode.text.length && sel.focusOffset === 0) || 
+          (sel.focusOffset === vnode.text.length && sel.anchorOffset === 0)) {
         execCommand(cmd, vnode);
       } else {
         const nodes = VNode.splitNode(vnode, [sel.anchorOffset, sel.focusOffset]);

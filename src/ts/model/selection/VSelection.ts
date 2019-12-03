@@ -31,7 +31,10 @@ export class VSelection {
   public get anchorOffset(): number { return this._anchorOffset; }
   public get focusNode(): VNode     { return this._focusNode; }
   public get focusOffset(): number  { return this._focusOffset; }
-  public get isCollapsed(): boolean { return this._anchorNode === this._focusNode && this._anchorOffset === this._focusOffset }
+  public get isCollapsed(): boolean { 
+    return this._anchorNode === this._focusNode && 
+           this._anchorOffset === this._focusOffset 
+  }
   public get rangeCount(): number   { return this._rangeCount; }
 
   constructor() {
